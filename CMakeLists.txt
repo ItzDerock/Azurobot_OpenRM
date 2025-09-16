@@ -48,12 +48,12 @@ configure_file(
 
 
 # 添加子目录
+add_subdirectory(src/utils)
 add_subdirectory(src/attack)
-add_subdirectory(src/kalman)
+dnd r# add_subdirectory(src/kalman)  # Disabled on Mac due to Ceres issues
 add_subdirectory(src/pointer)
 add_subdirectory(src/solver)
 add_subdirectory(src/uniterm)
-add_subdirectory(src/utils)
 add_subdirectory(src/video)
 
 if (CUDA_FOUND)
@@ -67,7 +67,7 @@ if (CUDA_FOUND)
     set(
         TARGETS_LIST
             openrm_attack
-            openrm_kalman
+            # openrm_kalman  # Disabled on Mac
             openrm_pointer
             openrm_solver
             openrm_delay
@@ -84,7 +84,7 @@ else()
     set(
         TARGETS_LIST
             openrm_attack
-            openrm_kalman
+            # openrm_kalman  # Disabled on Mac
             openrm_pointer
             openrm_solver
             openrm_delay

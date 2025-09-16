@@ -20,7 +20,7 @@ endif()
 target_sources(
     openrm_video
         PRIVATE
-        ${CMAKE_SOURCE_DIR}/src/video/uvc.cpp
+        # ${CMAKE_SOURCE_DIR}/src/video/uvc.cpp  # Linux-only
         ${CMAKE_SOURCE_DIR}/src/video/tools.cpp
         $<IF:$<BOOL:${HAVE_GXIAPI}>,${CMAKE_SOURCE_DIR}/src/video/daheng.cpp,>
 )
@@ -35,5 +35,7 @@ target_include_directories(
 target_link_libraries(
     openrm_video
         PRIVATE
+        ${OpenCV_LIBS}
+        openrm_timer
         $<IF:$<BOOL:${HAVE_GXIAPI}>,gxiapi,>
 )

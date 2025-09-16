@@ -13,7 +13,7 @@ daheng_count=$(find include/video/daheng -type f \( -name "*.h" \) -exec cat {} 
 
 total=$((include_count + src_count + cuda_count + terminal_count - daheng_count))
 
-max_threads=$(cat /proc/cpuinfo | grep "processor" | wc -l)
+max_threads=$(sysctl -n hw.ncpu)
 
 
 if [ ! -d "build" ]; then 
