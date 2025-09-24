@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 blue="\033[1;34m"
 yellow="\033[1;33m"
@@ -13,7 +13,7 @@ daheng_count=$(find include/video/daheng -type f \( -name "*.h" \) -exec cat {} 
 
 total=$((include_count + src_count + cuda_count + terminal_count - daheng_count))
 
-max_threads=$(sysctl -n hw.ncpu)
+max_threads=$(nproc)
 
 
 if [ ! -d "build" ]; then 

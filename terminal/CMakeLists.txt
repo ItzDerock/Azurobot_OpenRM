@@ -25,6 +25,10 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 find_package(Ceres REQUIRED)
 include_directories(${CERES_INCLUDE_DIRS})
 
+# ncurses
+find_package(Curses REQUIRED)
+include_directories(${CURSES_INCLUDE_DIRS})
+
 include_directories(${CMAKE_SOURCE_DIR}/include)
 add_executable(
     openrm
@@ -34,7 +38,7 @@ target_link_libraries(
     openrm
         ${OpenRM_LIBS}
         ${OpenCV_LIBS}
-        ncurses
+        ${CURSES_LIBRARIES}
 )
 
 install(

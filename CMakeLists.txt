@@ -10,6 +10,14 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_BUILD_TYPE RELEASE)
 add_compile_options(-O3 -w)
 
+# CUDA
+set(CMAKE_CUDA_ARCHITECTURES "native")
+find_package(CUDA)
+if (CUDA_FOUND)
+    message(STATUS "CUDA Version: ${CUDA_VERSION}")
+    include_directories(${CUDAToolkit_INCLUDE_DIRS})
+endif()
+
 # OpenCV
 find_package(OpenCV 4.5.4 REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
@@ -21,13 +29,6 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 # Ceres
 find_package(Ceres REQUIRED)
 include_directories(${CERES_INCLUDE_DIRS})
-
-# CUDA
-find_package(CUDA)
-if (CUDA_FOUND)
-    message(STATUS "CUDA Version: ${CUDA_VERSION}")
-    include_directories(/usr/local/cuda/include)
-endif()
 
 # 设置主版本号、次版本号和补丁版本号
 set(OPENRM_VERSION_MAJOR 1)
@@ -50,7 +51,7 @@ configure_file(
 # 添加子目录
 add_subdirectory(src/utils)
 add_subdirectory(src/attack)
-dnd r# add_subdirectory(src/kalman)  # Disabled on Mac due to Ceres issues
+# add_subdirectory(src/kalman)  # Disabled on Mac due to Ceres issues
 add_subdirectory(src/pointer)
 add_subdirectory(src/solver)
 add_subdirectory(src/uniterm)

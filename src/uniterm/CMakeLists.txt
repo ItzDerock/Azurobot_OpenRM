@@ -2,6 +2,9 @@ add_library(
     openrm_uniterm
         SHARED
 )
+
+find_package(Curses REQUIRED)
+
 target_sources(
     openrm_uniterm
         PRIVATE
@@ -15,8 +18,12 @@ target_include_directories(
         PRIVATE
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include/openrm>
+        ${CURSES_INCLUDE_DIRS}
 )
+
+message("CURSES: ${CURSES_INCLUDE_DIRS}")
+
 target_link_libraries(
     openrm_uniterm
-        ncurses
+        ${CURSES_LIBRARIES}
 )

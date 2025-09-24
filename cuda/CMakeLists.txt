@@ -2,11 +2,17 @@
 option(CUDA_USE_STATIC_CUDA_RUNTIME OFF)
 
 # 设置CUDA编译器和启用CUDA语言支持
-set(CMAKE_CUDA_COMPILER /usr/local/cuda/bin/nvcc)
+# Search for the nvcc compiler
+find_program(
+    CMAKE_CUDA_COMPILER    # The variable to store the result
+    NAMES nvcc             # The name of the program to find
+    HINTS /usr/local/cuda/bin  # A fallback search path
+)
 enable_language(CUDA)
 
 # 设置 CUDA 架构
-set(CMAKE_CUDA_ARCHITECTURES 7.0 8.7)
+# set(CMAKE_CUDA_ARCHITECTURES 7.0 8.7)
+set(CMAKE_CUDA_ARCHITECTURES "native")
 
 # 添加CUDA编译选项
 set(CUDA_NVCC_PLAGS ${CUDA_NVCC_PLAGS};-std=c++14;-g;-G;-Xcompiler;-w)
