@@ -21,7 +21,6 @@ target_link_libraries(
         nvinfer
         nvinfer_plugin
         nvonnxparser
-        nvparsers
         cudart
         cublas
 )

@@ -7,6 +7,10 @@
 using namespace nvinfer1;
 using namespace nvonnxparser;
 
+// TODO: Change this to match input/output tensor names of ONNX file
+const char* INPUT_NAME = "images";   
+const char* OUTPUT_NAME = "output"; 
+
 bool rm::initTrtOnnx(
     const std::string& onnx_file,
     const std::string& engine_file,
@@ -79,11 +83,12 @@ bool rm::initTrtOnnx(
         file.close();
 
         // 释放资源
-        parser->destroy();
-        network->destroy();
-        infer_builder->destroy();
-        config->destroy();
-        engine->destroy();
+        // Newer CUDA versions handle cleanup automatically
+        // parser->destroy();
+        // network->destroy();
+        // infer_builder->destroy();
+        // config->destroy();
+        // engine->destroy();
 
         rm::message("TensorRT ONNX model parsed and engine built", rm::MSG_OK);
         return true; 
@@ -91,10 +96,6 @@ bool rm::initTrtOnnx(
     } catch (const std::exception& e) {
         std::string error_message = e.what();
         rm::message("TensoRT ONNX : " + error_message, rm::MSG_ERROR);
-
-        if (*context) {
-            (*context)->destroy();
-        }
 
         return false;
     }
@@ -133,7 +134,7 @@ bool rm::initTrtEngine(
         }
 
         // 反序列化引擎
-        auto engine = runtime->deserializeCudaEngine(serialized_engine, size, nullptr);
+        auto engine = runtime->deserializeCudaEngine(serialized_engine, size);
         if (!engine) {
             throw std::runtime_error("Failed to deserialize TensorRT engine.");
         }
@@ -152,9 +153,6 @@ bool rm::initTrtEngine(
     } catch (const std::exception& e) {
         std::string error_message = e.what();
         rm::message("TensoRT Engine : " + error_message, rm::MSG_ERROR);
-        if (*context) {
-            (*context)->destroy();
-        }
         return false;
     }
 }
@@ -182,10 +180,9 @@ void rm::detectEnqueue(
     nvinfer1::IExecutionContext** context,
     cudaStream_t* stream
 ) {
-    float* device_buffer[2];
-    device_buffer[0] = input_device_buffer;
-    device_buffer[1] = output_device_buffer;
-    (*context)->enqueueV2((void**)device_buffer, *stream, nullptr);
+    (*context)->setTensorAddress(INPUT_NAME, input_device_buffer);
+    (*context)->setTensorAddress(OUTPUT_NAME, output_device_buffer);
+    (*context)->enqueueV3(*stream);
 }
 
 void rm::detectOutput(
