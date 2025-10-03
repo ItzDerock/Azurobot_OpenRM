@@ -21,7 +21,7 @@ target_include_directories(
         ${CURSES_INCLUDE_DIRS}
 )
 
-message("CURSES: ${CURSES_INCLUDE_DIRS}")
+message(STATUS "Found curses at: ${CURSES_INCLUDE_DIRS}")
 
 target_link_libraries(
     openrm_uniterm

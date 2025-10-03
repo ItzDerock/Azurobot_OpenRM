@@ -15,6 +15,8 @@ total=$((include_count + src_count + cuda_count + terminal_count - daheng_count)
 
 max_threads=$(nproc)
 
+shopt -s expand_aliases
+alias sudo=''
 
 if [ ! -d "build" ]; then 
     mkdir build

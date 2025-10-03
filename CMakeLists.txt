@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(OpenRM)
 
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 
 # set(CMAKE_BUILD_TYPE DEBUG)
@@ -17,6 +17,10 @@ if (CUDA_FOUND)
     message(STATUS "CUDA Version: ${CUDA_VERSION}")
     include_directories(${CUDAToolkit_INCLUDE_DIRS})
 endif()
+
+# GTK2 for opencv highgui
+find_package(GTK2)
+include_directories(${GTK2_INCLUDE_DIRS})
 
 # OpenCV
 find_package(OpenCV 4.5.4 REQUIRED)
@@ -47,7 +51,6 @@ configure_file(
     ${CMAKE_SOURCE_DIR}/cmake/VersionConfig.h.in
     ${CMAKE_CURRENT_BINARY_DIR}/VersionConfig.h)
 
-
 # 添加子目录
 add_subdirectory(src/utils)
 add_subdirectory(src/attack)
@@ -56,10 +59,12 @@ add_subdirectory(src/pointer)
 add_subdirectory(src/solver)
 add_subdirectory(src/uniterm)
 add_subdirectory(src/video)
+add_subdirectory(full_demo)
 
 if (CUDA_FOUND)
     add_subdirectory(src/tensorrt)
     add_subdirectory(cuda)
+    add_subdirectory(terminal)
 endif()
 
 

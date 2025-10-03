@@ -30,6 +30,7 @@
             eigen
             ceres-solver
             ncurses.dev
+            gtk2.dev
             
             # OpenCV with CUDA and contrib
             (opencv.override { enableContrib = true; enableCuda = true; })
@@ -42,7 +43,6 @@
             cudaPackages.cuda_cudart
           ]);
 
-          # The environment setup logic, now separate for reusability
           shellHook = ''
             export CC=${pkgs.gcc}/bin/gcc
             export CXX=${pkgs.gcc}/bin/g++
