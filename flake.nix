@@ -92,10 +92,11 @@
             paths = with pkgs; [ 
               bashInteractive 
               coreutils
-              cudaDevShell.buildInputs
-            ];
+              gnugrep
+              ripgrep
+            ] ++ cudaDevShell.buildInputs;
 
-            pathsToLink = ["/bin"];
+            pathsToLink = ["/"];
           };
         in {
           # Image 1: A Docker image that drops you into the CUDA dev shell
@@ -109,7 +110,7 @@
               Cmd = [
                 "/bin/bash"
                 "-c"
-                "${cudaDevShell.shellHook} exec /bin/bash"
+                "export PATH=${devEnvironment}/bin:$PATH; ${cudaDevShell.shellHook} exec /bin/bash"
               ];
             };
           };
