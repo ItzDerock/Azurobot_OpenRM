@@ -4,28 +4,19 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    # nix2container.url = "github:nlewo/nix2container";
+    nix2container.url = "github:nlewo/nix2container";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, nix2container }:
     flake-utils.lib.eachDefaultSystem (system:
       let
+        nix2containerPkgs = nix2container.packages.${system};
+        
         # Set allowUnfree to true for proprietary software like CUDA and TensorRT
         pkgs = import nixpkgs {
           inherit system;
           config.allowUnfree = true;
         };
-
-        # ncurses.dev uses many, many symlinks
-        # this triggers some edge-case when building the docker container
-        # ncursesDevSanitized = pkgs.runCommand "ncurses-dev-sanitized" {} ''
-        #   mkdir -p $out
-        #   rsync -a \
-        #     --copy-links \
-        #     --exclude '/include/ncurses' \
-        #     --exclude '/include/ncursesw' \
-        #     ${pkgs.ncurses.dev}/ $out/
-        # '';
 
         # main dev shell with cuda
         cudaDevShell = pkgs.mkShell {
@@ -38,8 +29,7 @@
             git
             eigen
             ceres-solver
-            ncursesDevSanitized
-            # ncurses.dev
+            ncurses.dev
             
             # OpenCV with CUDA and contrib
             (opencv.override { enableContrib = true; enableCuda = true; })
@@ -88,36 +78,44 @@
 
       in
       {
-        # Your existing dev shells
+        # Export the dev devShells
+        # users on nixos can `nix develop .#cuda` or `nix develop .`
         devShells = {
           default = defaultDevShell;
           cuda = cudaDevShell;
         };
 
         packages = let
+          # build environment to wrap into container
           devEnvironment = pkgs.buildEnv {
             name = "openrm-env";
-            paths = cudaDevShell.buildInputs;
+            paths = with pkgs; [ 
+              bashInteractive 
+              coreutils
+              cudaDevShell.buildInputs
+            ];
+
+            pathsToLink = ["/bin"];
           };
         in {
           # Image 1: A Docker image that drops you into the CUDA dev shell
-          openrm-cuda = pkgs.dockerTools.buildImage {
+          openrm-cuda = nix2containerPkgs.nix2container.buildImage {
             name = "openrm-dev";
             tag = "cuda";
 
-            copyToRoot = [ devEnvironment pkgs.bashInteractive ];
+            copyToRoot = devEnvironment;
 
             config = {
               Cmd = [
                 "/bin/bash"
                 "-c"
-                "${cudaDevShell.shellHook} && exec bash"
+                "${cudaDevShell.shellHook} exec /bin/bash"
               ];
             };
           };
 
           # Image 2: CUDA dev shell + a minimal VNC desktop environment
-          openrm-cuda-desktop = pkgs.dockerTools.buildImage {
+          openrm-cuda-desktop = nix2containerPkgs.nix2container.buildImage {
             name = "openrm-dev";
             tag = "desktop";
 
